@@ -1,18 +1,17 @@
-# 101.1. Determine and configure hardware settings
+# 101.1. Identificar y configurar las herramietnas de Hardware
 
-## **101.1 Determine and configure hardware settings**
+## __101.1 Identificar y configurar las herramientas de hardware__
 
-**Weight:**2
 
-**Description: **Candidates should be able to determine and configure fundamental system hardware.
+*__Descripcion:__* Los candidatos deben ser capaces de identificar y configurar el hardware fundamental del sistema.
 
-**Key Knowledge Areas:**
+*__Key Knowledge Areas:__*
 
-* Tools and utilities to list various hardware information (e.g. lsusb, lspci, etc.)
-* Tools and utilities to manipulate USB devices
-* Conceptual understanding of sysfs, udev, dbus
+* Herramientas y utilidades para listar información de hardware (por ejemplo, lsusb, lspci, etc.).
+* Herramientas y utilidades para manipular dispositivos de USB.
+* Entendiendo los conceptos de sysfs, udev, dbus.
 
-**The following is a partial list of the used files, terms and utilities:**
+*__La siguiente es una lista parcial de los archivos, términos y utilidades utilizados:__*
 
 * /sys/
 * /proc/
@@ -22,13 +21,12 @@
 * lspci
 * lsusb
 
-Linux treat every thing as a file. It includes programs , hardware and even processes which are running. These files are organized in directories and standardize for easier access and administration. Lets see how linux dealing with devices:
+Linux trata todo como un archivo. Esto incluye programas, hardware e incluso los procesos que están en ejecución. Estos archivos están organizados en directorios y estandarizados para facilitar su acceso y administración. Veamos cómo Linux maneja los dispositivos:
 
 ### /proc
+El directorio /proc es un directorio virtual que contiene un sistema de archivos virtual llamado procfs. No existe en un disco; en su lugar, el kernel lo crea en la memoria. Se utiliza para proporcionar información sobre el sistema (originalmente sobre los procesos).
 
-The /proc is a virtual dicretory which contains a illusionary filesystem called procfs. It does not exist on a disk. Instead, the kernel creates it in memory. It is used to provide information about the system (originally about processes).
-
-```
+```bash
 root@ubuntu16-1:~# ls /proc/
 1     17    186   20    215   232   26    4043  847        diskstats    pagetypeinfo
 10    1705  187   200   2152  233   2600  452   85         dma          partitions
@@ -61,13 +59,13 @@ root@ubuntu16-1:~# ls /proc/
 1698  1851  2     214   2311  2599  4     843   devices    net
 ```
 
-Some of the more important files and directories are :
+Algunos de los archivos y directorios más importantes son:
 
-**/proc/1:** A directory with information about process number 1. Each process has a directory below /proc with the name being its process identification number.
+*__/proc/1:__* Un directorio con información sobre el proceso número 1. Cada proceso tiene un directorio bajo /proc cuyo nombre es su número de identificación de proceso (PID).
 
-**/proc/cpuinfo: **Information about the processor, such as its type, make, model, and performance.
+*__/proc/cpuinfo:__* Información sobre el procesador, como su tipo, fabricante, modelo y rendimiento.
 
-```
+```bash
 root@ubuntu16-1:~# cat /proc/cpuinfo 
 processor    : 0
 vendor_id    : GenuineIntel
@@ -97,9 +95,9 @@ address sizes    : 43 bits physical, 48 bits virtual
 power management:
 ```
 
-**/proc/filesystems : **Filesystems configured into the kernel.
+*__/proc/filesystems :__* Sistema de archvios configurados en el kernel.
 
-```
+```bash
 root@blackfox:~# cat /proc/filesystems 
 nodev	sysfs
 nodev	rootfs
@@ -138,9 +136,10 @@ nodev	binfmt_misc
 
 ```
 
-**/proc/interrupts: **Shows which interrupts are in use, and how many of each there have been.
+*__/proc/interrupts:__* 
+Muestra qué interrupciones están en uso y cuántas de cada una han ocurrido.
 
-```
+```bash
 root@ubuntu16-1:~# cat /proc/interrupts 
             CPU0       
    0:          7   IO-APIC    2-edge      timer
@@ -209,9 +208,9 @@ root@ubuntu16-1:~# cat /proc/interrupts
  PIW:          0   Posted-interrupt wakeup event
 ```
 
-**/proc/meminfo : **Information about memory usage, both physical and swap.
+*__/proc/meminfo :__* Information about memory usage, both physical and swap.
 
-```
+```bash
 root@ubuntu16-1:~# cat /proc/meminfo 
 MemTotal:         994868 kB
 MemFree:          114032 kB
@@ -263,7 +262,8 @@ DirectMap2M:      927744 kB
 DirectMap1G:           0 kB
 ```
 
-The way /proc virtual directory organize processes get noticed by developers and they started to use /proc for both reading and writing information. So guess what, little by little /proc become a place which stored different kind of information. Processes information, current running Kernel information, hardware information, system information. Some one should do some thing to stop this messy place and that cause /sys introducing in kernel 2.5 .
+La forma en que el directorio virtual __/proc__ organiza los procesos fue notada por los desarrolladores, quienes comenzaron a usar /proc tanto para leer como para escribir información. Así que, poco a poco, /proc se convirtió en un lugar que almacenaba diferentes tipos de información: información de procesos, información del kernel en ejecución, información de hardware, información del sistema. Alguien debía hacer algo para detener este desorden, y eso llevó a la introducción de /sys en el kernel 2.5.
+
 
 ### /sys
 
