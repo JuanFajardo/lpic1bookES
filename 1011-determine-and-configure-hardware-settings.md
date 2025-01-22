@@ -267,11 +267,11 @@ La forma en que el directorio virtual __/proc__ organiza los procesos fue notada
 
 ### /sys
 
-/sys it is a virtual directory with illusionary sysfs file system, which is created when system boots up and get vanished when system restarts or goes off.
+*__/sys__* es un directorio virtual con un sistema de archivos ilusorio llamado sysfs, que se crea cuando el sistema arranca y desaparece cuando el sistema se reinicia o se apaga.
 
-sysfs introduced to specifically store system information and its components (mostly attached and installed hardware). An as it was planned for that its seems more organized and more standardize than procfs.
+sysfs fue introducido específicamente para almacenar información del sistema y de sus componentes (principalmente hardware conectado e instalado). Como fue diseñado para ese propósito, parece más organizado y estandarizado que procfs.
 
-```
+```bash
 root@ubuntu16-1:~# ls -l /sys/
 total 0
 drwxr-xr-x   2 root root 0 Oct 24 06:07 block
@@ -291,37 +291,37 @@ breakpoint  isa          msr         platform  software  tracepoint
 cpu         LNXSYSTM:00  pci0000:00  pnp0      system    virtual
 ```
 
-sysfs hasn't caused all the stuff move from /proc to /sys , they still exist in /proc but /sys gives us a better view of current data.
+sysfs no ha hecho que toda la información se mueva de /proc a /sys; todavía existe en /proc, pero /sys nos ofrece una vista más clara de los datos actuales.
 
-{% hint style="info" %}
-**Linux kernel modules** (LKMs) are pieces of code which can be loaded into the kernel much like a hot-swappable piece of hardware. they can be inserted into the kernel and activated without the system needing to be rebooted.
-{% endhint %}
+
+> *__Información:__*
+>Los módulos del kernel de Linux (LKMs, por sus siglas en inglés) son fragmentos de código que pueden cargarse en el kernel, al igual que un componente de hardware intercambiable en caliente. Pueden insertarse en el kernel y activarse sin necesidad de reiniciar el sistema.
+
 
 ### udev
 
-The kernel is the central part of operating system to address the hardware. And to make sure that the hardware is available for the kernel udev plays an important role.
+El kernel es la parte central de un sistema operativo, encargada de interactuar con el hardware. Para garantizar que el hardware esté disponible para el kernel, udev desempeña un papel importante.
 
-udev is a replacement for the Device File System (DevFS) starting with the Linux 2.6 kernel series. udev plays role in Loading Kernel Module, Creating Device Files and making sure every thing is the order we need it to be. Lets see how it works:
+udev reemplazó al Sistema de Archivos de Dispositivos (DevFS) a partir de la serie de kernels Linux 2.6. udev se encarga de tareas como cargar módulos del kernel, crear archivos de dispositivos y asegurarse de que todo esté organizado como se necesita. Veamos cómo funciona:
 
 ![](.gitbook/assets/hw-udev.jpg)
 
-1. The linux kernel initiates the device loading and next sends out messages (uevents) to the udev daemon.
-2. udev daemon catches the event and decide how to handle based on the attributes that it has received in the event. udev load required kernel module with necessary information using **modprobe**.
 
-{% hint style="success" %}
-what is modprobe?
+1. El kernel de Linux inicia la carga del dispositivo y luego envía mensajes (uevents) al demonio udev.
+2. El demonio udev captura el evento y decide cómo manejarlo según los atributos que ha recibido en el evento. udev carga el módulo del kernel necesario con la información necesaria utilizando modprobe.
 
-**modprobe** is an intelligent command for listing, inserting as well as removing modules from the kernel.( Will be explained )
-{% endhint %}
+> *__¿que es modprobe?__*
+>
+> __modprobe__ Es un comando inteligente para listar, insertar y eliminar módulos del kernel. (Será explicado más adelante.)
 
-3 . udev next reads its rules . udev allows us to ban devices based on their properties, like vendor ID and device ID, ... .
+3. Luego, udev lee sus reglas. udev nos permite bloquear dispositivos según sus propiedades, como el ID del proveedor y el ID del dispositivo, ...
 
-* Default rules are in /lib/udev/rules.d
-* Custom rules are in /etc/udev/rules.d
+* Las reglas predeterminadas están en /lib/udev/rules.d
+* Las reglas personalizadas están en /etc/udev/rules.d
 
-Lets see it in action, we use and then attach a usb storage:
+Veámoslo en acción, usamos y luego conectamos un almacenamiento USB:
 
-```
+```bash
 root@ubuntu16-1:~# udevadm monitor 
 monitor will print the received events for:
 UDEV - the event which udev sends out after rule processing
@@ -365,15 +365,13 @@ KERNEL[12771.061812] add      /module/nls_iso8859_1 (module)
 UDEV  [12771.063716] add      /module/nls_iso8859_1 (module)
 ```
 
-udev write device information to the /sys virtual directory. Also udev works as an Hardware Abstaraction Layer(HAL) and creates device file entries under /dev directory in a structured way.
+udev escribe la información del dispositivo en el directorio virtual /sys. Además, udev funciona como una Capa de Abstracción de Hardware (HAL) y crea entradas de archivos de dispositivos bajo el directorio /dev de manera estructurada.
 
-{% hint style="success" %}
-What is HAL? In computers, a **hardware abstraction layer** (**HAL**) is a **layer** of programming that allows a computer OS to interact with a **hardware** device at a general or **abstract level** rather than at a detailed **hardware level**.
-{% endhint %}
+> *__¿Qué es HAL?__* En computadoras, una capa de abstracción de hardware (HAL) es una capa de programación que permite que un sistema operativo interactúe con un dispositivo de hardware a un nivel general o abstracto en lugar de a un nivel detallado de hardware.
 
-another example:
+Otro ejemplo:
 
-```
+```bash
 root@ubuntu16-1:~# udevadm info --query=all --name=/dev/sdb
 P: /devices/pci0000:00/0000:00:11.0/0000:02:03.0/usb1/1-1/1-1:1.0/host33/target33:0:0/33:0:0:0/block/sdb
 N: sdb
@@ -409,19 +407,21 @@ E: TAGS=:systemd:
 E: USEC_INITIALIZED=12770500291
 ```
 
-We have seen this information previously. Try `udevadm info --attribute-walk --name=/dev/sda` for your self. These device attributes can be used in udev rules.
+
+Hemos visto esta información anteriormente. Intenta `udevadm info --attribute-walk --name=/dev/sda` por ti mismo. Estos atributos de dispositivos pueden ser utilizados en las reglas de udev.
 
 ### /dev
 
-This directory contains the **device files** for every hardware device attached to the system.
+Este directorio contiene los **archivos de dispositivos** para cada dispositivo de hardware conectado al sistema.
 
-> **Device files** are employed to provide the operating system and users an interface to the devices that they represent.
+> **Los archivos de dispositivos** se utilizan para proporcionar al sistema operativo y a los usuarios una interfaz con los dispositivos que representan.
 
-/dev exits from early beginning versions of linux and it was populated by devfs. (As we mentioned) devfs was a an **obsolete and no longer available.**
+El directorio /dev existe desde las primeras versiones de Linux y fue poblado por devfs. (Como mencionamos) devfs era obsoleto y ya no está disponible.
 
- These days, it has been replaced by udev, a daemon that manages the contents of /dev in a temporary filesystem, **(**or by devtmpfs, which is a lightweight replacement for devfs that is used in some minimal systems).
+Hoy en día, ha sido reemplazado por udev, un demonio que gestiona el contenido de /dev en un sistema de archivos temporal, (o por devtmpfs, que es un reemplazo ligero de devfs que se usa en algunos sistemas mínimos).
 
-```
+
+```bash
 root@ubuntu16-1:~# ls /dev/
 agpgart          hwrng               port      tty10  tty33  tty56      ttyS2    vcs1
 autofs           initctl             ppp       tty11  tty34  tty57      ttyS20   vcs2
@@ -450,11 +450,11 @@ hpet             network_throughput  tty0      tty31  tty54  ttyS18     userio
 hugepages        null                tty1      tty32  tty55  ttyS19     vcs
 ```
 
-Actually they are files and pointers to the under laying device hardware. Try`ls -l` to see that .
+En realidad, son archivos y punteros al hardware subyacente del dispositivo. Intenta `ls -l` para verlo.
 
-There are some common device names in .in linux World :
+Existen algunos nombres comunes de dispositivos en el mundo de Linux:
 
-```
+```bash
 Name    Device
 cdrom    CD drive
 console    Special entry for the currently used console.
@@ -483,40 +483,35 @@ usb*    USB card and scanner
 video*    For use with a graphics card supporting video.
 ```
 
-with the special thanks of udev (as a Hardware Abstraction Layer) and the names it provides.
+Con el agradecimiento especial a udev (como Capa de Abstracción de Hardware) y los nombres que proporciona.
 
-{% hint style="info" %}
 ### /sys vs /dev
 
-* The /sys filesystem (sysfs) contains files that provide information about devices: whether it's powered on, the vendor name and model, what bus the device is plugged into, etc. It's of interest to applications that manage devices.
-* The /dev filesystem contains files that allow programs to access the devices themselves: write data to a serial port, read a hard disk, etc. It's of interest to applications that access devices.
+* El sistema de archivos /sys (sysfs) contiene archivos que proporcionan información sobre los dispositivos: si están encendidos, el nombre y modelo del proveedor, en qué bus está conectado el dispositivo, etc. Es de interés para aplicaciones que gestionan dispositivos.
+* El sistema de archivos /dev contiene archivos que permiten a los programas acceder a los propios dispositivos: escribir datos en un puerto serial, leer un disco duro, etc. Es de interés para aplicaciones que acceden a dispositivos.
 
-A metaphor is that /sys provides access to the packaging, while /dev provides access to the content of the box.
+Una metáfora sería que /sys proporciona acceso al embalaje, mientras que /dev proporciona acceso al contenido de la caja.
 
-The reason for /dev existing independently of /sys is partly historical: /dev dates back to the dawn of Unix, while /sys is a much more recent invention. If Linux was designed today with no historical background, /dev/sda might be /sys/block/sda/content.
-{% endhint %}
+La razón por la que /dev existe independientemente de /sys es en parte histórica: /dev data de los inicios de Unix, mientras que /sys es una invención mucho más reciente. Si Linux se diseñara hoy sin un contexto histórico, /dev/sda podría ser /sys/block/sda/content.
 
-{% hint style="success" %}
-#### pesudo File Systems
-
-'Pseudo-' means false, pretend. So "pseudo-filesystem" means a filesystem that doesn't have actual files – rather, it has virtual entries that the filesystem itself makes up on the spot.
-
-/dev, /proc and /sys are virtual "pseudo-filesystems" (not existing on harddisk, but only in RAM – so they do not consume any harddisk space and are completely created on boot).
-{% endhint %}
+> #### Sistemas de Archivos Pseudo
+>
+> 'Pseudo' significa falso, simulado. Así que "sistema de archivos pseudo" significa un sistema de archivos que no tiene archivos reales; más bien, tiene entradas virtuales que el propio sistema de archivos crea en el momento.
+>
+> /dev, /proc y /sys son "sistemas de archivos pseudo" virtuales (no existen en el disco duro, sino solo en la RAM, por lo que no consumen espacio en el disco duro y se crean completamente al arrancar). {% endhint %}
 
 ### dbus
+D-Bus es un sistema de mensajería, una manera simple para que las aplicaciones se comuniquen entre sí. Además de todos los beneficios de dbus, puede leer información del directorio /dev y relacionarla con los programas del escritorio del usuario mediante señales. De hecho, dbus actúa como una capa intermedia que mantiene a los programas alejados de las dificultades de tratar con los directorios /dev y /sys.
 
-D-Bus is a message bus system, a simple way for applications to talk to one another. Beside all of dbus benefits it can read information form /dev folder and relate them with user desktop programs using signals. In fact dbus make a kind of middle layer which keeps programs a way from difficulties of dealing with /dev and /sys directories.
+**Nota:** udev y dbus pueden funcionar en todas las distribuciones porque sysfs ha estandarizado la información requerida.
 
-**Notice : **udev and dbus can work in all distributions because sysfs has made required information standardize.
-
-From the administrative perspective there are some ls utilities ( lsusb, lspci , ... ) to show more information about the hardware which has been attached to our system. Lets take a quick look at them:
+Desde una perspectiva administrativa, existen algunas utilidades de ls (como lsusb, lspci, ...) que muestran más información sobre el hardware que está conectado a nuestro sistema. Echemos un vistazo rápido a ellas:
 
 ### lsusb
+El comando lsusb permite mostrar información sobre los buses USB y los dispositivos que están conectados a ellos.
 
-The lsusb command allows you to display information about USB buses and devices that are attached to them.
 
-```
+```bash
 root@ubuntu16-1:~# lsusb
 Bus 001 Device 002: ID 0951:1625 Kingston Technology DataTraveler 101 II
 Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
